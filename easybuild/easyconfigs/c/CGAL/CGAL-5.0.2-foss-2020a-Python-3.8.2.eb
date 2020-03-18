@@ -1,0 +1,40 @@
+name = 'CGAL'
+version = '5.0.2'
+versionsuffix = '-Python-%(pyver)s'
+
+homepage = 'http://www.cgal.org/'
+description = """The goal of the CGAL Open Source Project is to provide easy access to efficient
+ and reliable geometric algorithms in the form of a C++ library."""
+
+toolchain = {'name': 'foss', 'version': '2020a'}
+toolchainopts = {'strict': True}
+
+#source_urls = ['https://github.com/CGAL/cgal/releases/tag/releases%2FCGAL-%(version)s']
+#sources = ['%(name)s-%(version)s-library.tar.xz']
+source_urls = ['https://github.com/CGAL/cgal/archive/releases']
+sources = [SOURCE_TAR_GZ]
+checksums = ['7d824efce318fe901fd9d6f233a1f27e2d956d787602621df035a759b587c40c']
+
+builddependencies = [
+    ('CMake', '3.16.4'),
+    ('Eigen', '3.3.7', '', True),
+]
+
+dependencies = [
+    ('zlib', '1.2.11'),
+    ('Python', '3.8.2'),
+    ('Boost', '1.72.0'),
+    ('MPFR', '4.0.2'),
+    ('GMP', '6.2.0'),
+#!    ('Mesa', '19.0.1'),
+#!    ('libGLU', '9.0.0'),
+#!    ('Qt5', '5.12.3'),
+]
+
+configopts = "-DOPENGL_INCLUDE_DIR=$EBROOTMESA/include\;$EBROOTLIBGLU/include "
+configopts += "-DOPENGL_gl_LIBRARY=$EBROOTMESA/lib/libGL.%s " % SHLIB_EXT
+configopts += "-DOPENGL_glu_LIBRARY=$EBROOTLIBGLU/lib/libGLU.%s " % SHLIB_EXT
+configopts += "-DWITH_ZLIB=ON -DWITH_MPFR=ON -DWITH_OpenGL=ON -DWITH_Eigen3=ON "
+configopts += "-DWITH_GMPXX=ON -DWITH_LAPACK=ON -DWITH_BLAS=ON "
+
+moduleclass = 'numlib'
