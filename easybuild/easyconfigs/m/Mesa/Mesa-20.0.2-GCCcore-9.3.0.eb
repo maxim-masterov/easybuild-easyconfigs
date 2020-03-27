@@ -1,5 +1,4 @@
 # This is a Mesa using software rendering via Gallium-DRI and libglvnd
-#
 # - libglvnd can dynamically choose between system-installed NVidia
 #   libGLX/libEGL or the software renderers provided by this Mesa
 # - EGL is available
@@ -9,8 +8,6 @@
 # - swr: Intel's OpenSWR
 # Default renderer is llvmpipe. SWR can be enabled by setting the environment
 # variable GALLIUM_DRIVER=swr
-
-easyblock = 'MesonNinja'
 
 name = 'Mesa'
 version = '20.0.2'
@@ -58,10 +55,8 @@ dependencies = [
     ('X11', '20200222'),
 ]
 
-configopts = " -Dplatforms=x11 -Dosmesa=gallium -Ddri-drivers='' -Dvulkan-drivers=''"
-configopts += " -Dllvm=true -Dshared-llvm=true"
-configopts += " -Dlibunwind=true"
-configopts += " -Dglvnd=true"
+configopts = "-Dplatforms=x11 -Dosmesa=gallium -Ddri-drivers='' -Dvulkan-drivers='' "
+configopts += "-Dllvm=true -Dshared-llvm=true -Dlibunwind=true -Dglvnd=true"
 
 # symlink indirect to mesa GLX, similar to Debian, see
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=881789
@@ -70,13 +65,5 @@ postinstallcmds = ["ln -s libGLX_mesa.so.0 %(installdir)s/lib/libGLX_indirect.so
 
 # Tells libglvnd where to find EGL libraries
 modextrapaths = {"__EGL_VENDOR_LIBRARY_DIRS": "share/glvnd/egl_vendor.d"}
-
-sanity_check_paths = {
-    'files': ['lib/%s.%s' % (l, SHLIB_EXT)
-              for l in ['libEGL_mesa', 'libgbm', 'libglapi', 'libGLX_mesa', 'libOSMesa']] +
-             ['include/%s.h' % h
-              for h in ['EGL/eglmesaext', 'EGL/eglextchromium', 'GL/osmesa', 'GL/internal/dri_interface']],
-    'dirs': ['lib/dri', 'share/glvnd'],
-}
 
 moduleclass = 'vis'
