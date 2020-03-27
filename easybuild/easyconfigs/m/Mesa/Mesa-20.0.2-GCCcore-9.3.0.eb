@@ -61,7 +61,43 @@ configopts += "-Dllvm=true -Dshared-llvm=true -Dlibunwind=true -Dglvnd=true"
 # symlink indirect to mesa GLX, similar to Debian, see
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=881789
 # This helps in certain X forwarding situations (e.g. XQuartz)
-postinstallcmds = ["ln -s libGLX_mesa.so.0 %(installdir)s/lib/libGLX_indirect.so.0"]
+#postinstallcmds = ["ln -s libGLX_mesa.so.0 %(installdir)s/lib/libGLX_indirect.so.0"]
+
+postinstallcmds = [
+"""
+ln -s libGLX_mesa.so.0 %(installdir)s/lib/libGLX_indirect.so.0
+
+declare -a libs_names=("libswrAVX.so.0.0.0" "libGLX_mesa.so.0.0.0" "libglapi.so.0.0.0" "libgbm.so.1.0.0" "libEGL_mesa.so.0.0.0" "libOSMesa.so.8.0.0" "libswrAVX2.so.0.0.0")
+for lib_name in "${libs_names[@]}"; do
+  old_rpath=$(patchelf --print-rpath %(installdir)s/lib/$lib_name);
+  ldflags_clean=$(echo ${LDFLAGS} | sed 's/-L//g')  # Strip starting '-L'
+  new_rpath=$old_rpath;
+  
+  # Loop through flags in LDFLAGS. If current flag is not in old_rpath, append it to new_rpath
+  echo "LDFLAGS: ${LDFLAGS}"
+  echo "ldflags_clean: ${ldflags_clean}"
+  
+  for flag in ${ldflags_clean}; do
+    if ! $(echo $old_rpath | grep -q $flag); then
+      echo "Adding flag: $flag"
+      new_rpath="$new_rpath:$flag";
+    fi;
+  done
+  
+  echo "old rpath: $old_rpath"
+  echo "new rpath: $new_rpath"
+  
+  patchelf --remove-rpath %(installdir)s/lib/$lib_name
+  patchelf --force-rpath --set-rpath "$new_rpath" %(installdir)s/lib/$lib_name
+  readelf -d %(installdir)s/lib/$lib_name
+  tmp=$LD_LIBRARY_PATH
+  unset LD_LIBRARY_PATH
+  ldd %(installdir)s/lib/$lib_name
+  LD_LIBRARY_PATH=$tmp
+done
+"""
+]
+                         
 
 # Tells libglvnd where to find EGL libraries
 modextrapaths = {"__EGL_VENDOR_LIBRARY_DIRS": "share/glvnd/egl_vendor.d"}
