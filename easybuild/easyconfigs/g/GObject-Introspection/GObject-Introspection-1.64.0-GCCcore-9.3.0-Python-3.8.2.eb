@@ -41,4 +41,55 @@ sanity_check_paths = {
     'dirs': ['include', 'share']
 }
 
+postinstallcmds = [
+"""
+declare -a libs_names=("libgirepository-1.0.so.1.0.0")
+for lib_name in "${libs_names[@]}"; do
+  old_rpath=$(patchelf --print-rpath %(installdir)s/lib/$lib_name);
+  ldflags_clean=$(echo ${LDFLAGS} | sed 's/-L//g')  # Strip starting '-L'
+  new_rpath=$old_rpath;
+  echo "LDFLAGS: ${LDFLAGS}"
+  echo "ldflags_clean: ${ldflags_clean}"
+  for flag in ${ldflags_clean}; do
+    if ! $(echo $old_rpath | grep -q $flag); then
+      echo "Adding flag: $flag"
+      new_rpath="$new_rpath:$flag";
+    fi;
+  done
+  echo "old rpath: $old_rpath"
+  echo "new rpath: $new_rpath"
+  patchelf --remove-rpath %(installdir)s/lib/$lib_name
+  patchelf --force-rpath --set-rpath "$new_rpath" %(installdir)s/lib/$lib_name
+  readelf -d %(installdir)s/lib/$lib_name
+  tmp=$LD_LIBRARY_PATH
+  unset LD_LIBRARY_PATH
+  ldd %(installdir)s/lib/$lib_name
+  LD_LIBRARY_PATH=$tmp
+done
+declare -a bins_names=("g-ir-generate" "g-ir-inspect" "g-ir-compiler")
+for bin_name in "${bins_names[@]}"; do
+  old_rpath=$(patchelf --print-rpath %(installdir)s/bin/$bin_name);
+  ldflags_clean=$(echo ${LDFLAGS} | sed 's/-L//g')  # Strip starting '-L'
+  new_rpath=$old_rpath;
+  echo "LDFLAGS: ${LDFLAGS}"
+  echo "ldflags_clean: ${ldflags_clean}"
+  for flag in ${ldflags_clean}; do
+    if ! $(echo $old_rpath | grep -q $flag); then
+      echo "Adding flag: $flag"
+      new_rpath="$new_rpath:$flag";
+    fi;
+  done
+  echo "old rpath: $old_rpath"
+  echo "new rpath: $new_rpath"
+  patchelf --remove-rpath %(installdir)s/bin/$bin_name
+  patchelf --force-rpath --set-rpath "$new_rpath" %(installdir)s/bin/$bin_name
+  readelf -d %(installdir)s/bin/$bin_name
+  tmp=$LD_LIBRARY_PATH
+  unset LD_LIBRARY_PATH
+  ldd %(installdir)s/bin/$bin_name
+  LD_LIBRARY_PATH=$tmp
+done
+"""
+]
+
 moduleclass = 'devel'
