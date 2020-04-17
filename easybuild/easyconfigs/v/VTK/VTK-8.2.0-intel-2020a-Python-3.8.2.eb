@@ -68,7 +68,9 @@ configopts += "-DPYTHON_INCLUDE_DIR=$EBROOTPYTHON/include/python%(pyshortver)s "
 configopts += "-DPYTHON_LIBRARY=$EBROOTPYTHON/lib/libpython%%(pyshortver)s.%s " % SHLIB_EXT
 # Other
 configopts += "-DVTK_Group_MPI:BOOL=ON "
-configopts += "-DCMAKE_INSTALL_LIBDIR=lib"
+configopts += "-DCMAKE_INSTALL_LIBDIR=lib "
+
+configopts += '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -xCORE-AVX2 -ftz -fp-speculation=safe -fp-model source -no-ipo" '
 
 preinstallopts = "export PYTHONPATH=%(installdir)s/lib/python%(pyshortver)s/site-packages:$PYTHONPATH && "
 
