@@ -1,0 +1,20 @@
+# Inject correct installation path
+# This patch is based on the previous patch for Qwt-6.1.4 by Davide Vanzo
+# Adapted for Qwt-6.2.0 by @maxim-masterov
+
+diff -Nru qwt-6.2.0.orig/qwtconfig.pri qwt-6.2.0/qwtconfig.pri
+--- qwt-6.2.0.orig/qwtconfig.pri	2021-08-11 11:43:04.135569188 +0200
++++ qwt-6.2.0/qwtconfig.pri	2021-08-11 11:44:19.562993642 +0200
+@@ -16,10 +16,10 @@
+ # Install paths
+ ######################################################################
+ 
+-QWT_INSTALL_PREFIX = $$[QT_INSTALL_PREFIX]
++QWT_INSTALL_PREFIX = $$(QWT_PREFIX)
+ 
+ unix {
+-    QWT_INSTALL_PREFIX    = /usr/local/qwt-$$QWT_VERSION
++    QWT_INSTALL_PREFIX    = $$(QWT_PREFIX)
+     # QWT_INSTALL_PREFIX = /usr/local/qwt-$$QWT_VERSION-qt-$$QT_VERSION
+ }
+ 

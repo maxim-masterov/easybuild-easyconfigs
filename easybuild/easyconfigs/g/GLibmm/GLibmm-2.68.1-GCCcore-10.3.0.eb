@@ -1,0 +1,41 @@
+easyblock = 'MesonNinja'
+
+name = 'GLibmm'
+version = '2.68.1'
+
+homepage = 'https://www.gtk.org/'
+description = """C++ bindings for Glib"""
+
+toolchain = {'name': 'GCCcore', 'version': '10.3.0'}
+toolchainopts = {'pic': True}
+
+source_urls = [FTPGNOME_SOURCE]
+sources = [SOURCELOWER_TAR_XZ]
+#source_urls = ['https://ftp.gnome.org/pub/gnome/sources/glibmm/%(version_major_minor)s/']
+#sources = ['%(namelower)s-%(version)s.tar.xz']
+#patches = ['GLibmm-%(version)s_Fix_gobject_type.patch']
+checksums = [
+    '6664e27c9a9cca81c29e35687f49f2e0d173a2fc9e98c3428311f707db532f8c',  # glibmm-2.68.1.tar.xz
+#    '3ef7a95e80ab58ea9369a7842c4d2917c8bce828f2754eafd075cf82405c9564',  # GLibmm-2.49.7_Fix_gobject_type.patch
+]
+
+builddependencies = [
+    ('Meson', '0.58.0'),
+    ('Ninja', '1.10.2'),
+]
+
+dependencies = [
+    ('GLib', '2.68.2'),
+    ('libsigc++', '3.0.7'),
+]
+
+# ignore deprecation warnings that are treated like errors due changed defaults in recent GCC versions
+#buildopts = 'V=1 CXXFLAGS="$CXXFLAGS -Wno-deprecated -Wno-deprecated-declarations"'
+
+sanity_check_paths = {
+    'files': ['lib/libglibmm-2.68.%s' % SHLIB_EXT, 'lib/libgiomm-2.68.%s' % SHLIB_EXT,
+              'include/glibmm-2.68/glibmm.h', 'include/giomm-2.68/giomm.h'],
+    'dirs': ['lib/pkgconfig'],
+}
+
+moduleclass = 'vis'

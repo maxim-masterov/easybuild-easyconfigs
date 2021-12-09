@@ -1,6 +1,6 @@
 diff -Nru fsl.orig/config/buildSettings.mk fsl/config/buildSettings.mk
---- fsl.orig/config/buildSettings.mk	2021-02-08 11:04:04.987725895 +0100
-+++ fsl/config/buildSettings.mk	2021-02-08 12:43:08.386020070 +0100
+--- fsl.orig/config/buildSettings.mk	2021-06-11 17:19:38.000000000 +0200
++++ fsl/config/buildSettings.mk	2021-12-02 20:04:05.282688000 +0100
 @@ -18,7 +18,7 @@
  CHMOD = /bin/chmod
  MKDIR = /bin/mkdir
@@ -10,7 +10,7 @@ diff -Nru fsl.orig/config/buildSettings.mk fsl/config/buildSettings.mk
  DEPENDFLAGS = -MM
  MACHDBGFLAGS = -g
  #####################################################################
-@@ -33,17 +33,17 @@
+@@ -33,43 +33,43 @@
  LIB_CEPHES = ${FSLEXTLIB}
  INC_CEPHES = ${FSLEXTINC}/cephes
  # GD library
@@ -34,7 +34,12 @@ diff -Nru fsl.orig/config/buildSettings.mk fsl/config/buildSettings.mk
  # PROB library
  # This is now for legacy support only
  LIB_PROB = ${FSLEXTLIB}
-@@ -55,21 +55,21 @@
+ INC_PROB = ${FSLEXTINC}/cprob
+ # CPROB library
+ LIB_CPROB = ${FSLEXTLIB}
+-INC_CPROB = ${FSLEXTINC}/
++INC_CPROB = ${FSLEXTINC}/cprob
+ # NEWRAN library
  LIB_NEWRAN = ${FSLEXTLIB}
  INC_NEWRAN = ${FSLEXTINC}/newran
  # BOOST library
@@ -65,52 +70,6 @@ diff -Nru fsl.orig/config/buildSettings.mk fsl/config/buildSettings.mk
  # NEWMAT library/armadillo
  INC_NEWMAT = ${FSLEXTINC}/armawrap/armawrap -DARMA_USE_LAPACK -DARMA_USE_BLAS -DARMA_64BIT_WORD
  #####################################################################
-@@ -79,17 +79,17 @@
- #####################################################################
- ifeq ($(SYSTYPE), Darwin)
- ###############   System Vars   #####################################
--CC = cc
--CXX = c++
--CXX11 = clang++
-+CC := ${CC}
-+CXX := ${CXX}
-+CXX11 := ${CXX} -std=c++11
- CSTATICFLAGS =
- CXXSTATICFLAGS =
- CFLAGS = -std=c99
- ARCHFLAGS = -arch x86_64
- ARCHLDFLAGS = -Wl,-search_paths_first -arch x86_64
- PER_ARCH_CFLAGS_x86_64 = -msse3
--OPTFLAGS =  -O3
--GNU_ANSI_FLAGS = -Wall -pedantic
-+OPTFLAGS :=  ${OPTFLAGS} ${ARCHFLAGS}
-+GNU_ANSI_FLAGS = -Wall -pedantic -Wno-long-long
- ANSI_CFLAGS = ${GNU_ANSI_FLAGS}
- ANSI_CXXFLAGS = ${GNU_ANSI_FLAGS} -ansi
- RANLIB = ranlib
-@@ -97,10 +97,10 @@
- # Armadillo library
- LIB_NEWMAT = ${FSLEXTLIB} -llapack -lblas
- # ZLIB library, not build on modern OSX as already present
--LIB_ZLIB = ${FSLEXTLIB}
--INC_ZLIB = ${FSLEXTINC}
-+LIB_ZLIB = ${EBROOTZLIB}/lib
-+INC_ZLIB = ${EBROOTZLIB}/include
- # QT library
--QTDIR = /sw
-+QTDIR = ${EBROOTQT}
- LIB_QT = ${QTDIR}/lib
- INC_QT = ${QTDIR}/include
- # VTK library
-@@ -109,7 +109,7 @@
- VTKSUFFIX = -7.0
- # CUDA library
- CUDAVER := $(or $(CUDAVER),7.5)
--CUDA_INSTALLATION = /Developer/NVIDIA/CUDA-${CUDAVER}
-+CUDA_INSTALLATION := ${EBROOTCUDA}
- GENCODE_FLAGS = $(shell ${FSLDIR}/config/common/supportedGencodes.sh ${CUDA_INSTALLATION})
- LIB_CUDA = ${CUDA_INSTALLATION}/lib
- INC_CUDA = ${CUDA_INSTALLATION}/include
 @@ -127,16 +127,16 @@
  #####################################################################
  ifeq ($(SYSTYPE), Linux)
@@ -166,8 +125,8 @@ diff -Nru fsl.orig/config/buildSettings.mk fsl/config/buildSettings.mk
  LIB_NEWMAT = ${FSLEXTLIB} -lopenblas
  # get and then parse gcc version to run context specific builds
 diff -Nru fsl.orig/config/common/vars.mk fsl/config/common/vars.mk
---- fsl.orig/config/common/vars.mk	2021-02-08 11:04:05.015728317 +0100
-+++ fsl/config/common/vars.mk	2021-02-08 11:13:00.342036033 +0100
+--- fsl.orig/config/common/vars.mk	2021-06-11 17:19:38.000000000 +0200
++++ fsl/config/common/vars.mk	2021-12-02 19:58:31.681505000 +0100
 @@ -24,14 +24,14 @@
  USRCFLAGS = 
  USRCXXFLAGS =
@@ -188,8 +147,8 @@ diff -Nru fsl.orig/config/common/vars.mk fsl/config/common/vars.mk
  
  HFILES = *.h
 diff -Nru fsl.orig/etc/fslconf/fsl.csh fsl/etc/fslconf/fsl.csh
---- fsl.orig/etc/fslconf/fsl.csh	2021-02-08 11:03:14.719377384 +0100
-+++ fsl/etc/fslconf/fsl.csh	2021-02-08 11:13:36.585170977 +0100
+--- fsl.orig/etc/fslconf/fsl.csh	2020-08-19 10:59:54.000000000 +0200
++++ fsl/etc/fslconf/fsl.csh	2021-12-02 19:59:53.928239000 +0100
 @@ -25,8 +25,8 @@
  # The following variables specify paths for programs and can be changed
  #  or replaced by different programs ( e.g. FSLDISPLAY=open   for MacOSX)
@@ -202,8 +161,8 @@ diff -Nru fsl.orig/etc/fslconf/fsl.csh fsl/etc/fslconf/fsl.csh
  # The following variables are used for running code in parallel across
  #  several machines ( i.e. for FDT )
 diff -Nru fsl.orig/etc/fslconf/fsl-devel.sh fsl/etc/fslconf/fsl-devel.sh
---- fsl.orig/etc/fslconf/fsl-devel.sh	2021-02-08 11:03:14.715377038 +0100
-+++ fsl/etc/fslconf/fsl-devel.sh	2021-02-08 11:13:56.834922539 +0100
+--- fsl.orig/etc/fslconf/fsl-devel.sh	2020-08-19 10:59:54.000000000 +0200
++++ fsl/etc/fslconf/fsl-devel.sh	2021-12-02 20:00:05.827927000 +0100
 @@ -26,8 +26,8 @@
  # The following variables specify paths for programs and can be changed
  #  or replaced by different programs ( e.g. FSLDISPLAY=open   for MacOSX)
@@ -216,8 +175,8 @@ diff -Nru fsl.orig/etc/fslconf/fsl-devel.sh fsl/etc/fslconf/fsl-devel.sh
  export FSLTCLSH FSLWISH 
  
 diff -Nru fsl.orig/etc/fslconf/fsl.sh fsl/etc/fslconf/fsl.sh
---- fsl.orig/etc/fslconf/fsl.sh	2021-02-08 11:03:14.719377384 +0100
-+++ fsl/etc/fslconf/fsl.sh	2021-02-08 11:14:15.360524969 +0100
+--- fsl.orig/etc/fslconf/fsl.sh	2020-08-19 10:59:54.000000000 +0200
++++ fsl/etc/fslconf/fsl.sh	2021-12-02 20:00:21.153315000 +0100
 @@ -26,8 +26,8 @@
  # The following variables specify paths for programs and can be changed
  #  or replaced by different programs ( e.g. FSLDISPLAY=open   for MacOSX)
@@ -230,8 +189,8 @@ diff -Nru fsl.orig/etc/fslconf/fsl.sh fsl/etc/fslconf/fsl.sh
  export FSLTCLSH FSLWISH 
  
 diff -Nru fsl.orig/src/film/Makefile fsl/src/film/Makefile
---- fsl.orig/src/film/Makefile	2021-02-08 11:04:08.808056377 +0100
-+++ fsl/src/film/Makefile	2021-02-08 11:15:19.934110498 +0100
+--- fsl.orig/src/film/Makefile	2020-07-15 11:54:04.000000000 +0200
++++ fsl/src/film/Makefile	2021-12-02 20:01:08.998044000 +0100
 @@ -28,7 +28,7 @@
  	${CXX}  ${CXXFLAGS} ${LDFLAGS} -o $@ ${OBJS} ftoz.o ${LIBS}
  
@@ -242,10 +201,10 @@ diff -Nru fsl.orig/src/film/Makefile fsl/src/film/Makefile
  film_gls_res:${OBJS} film_gls_res.o
  	${CXX}  ${CXXFLAGS} ${LDFLAGS} -o $@ ${OBJS} film_gls_res.o ${LIBS}
 diff -Nru fsl.orig/src/fslsurface/Makefile fsl/src/fslsurface/Makefile
---- fsl.orig/src/fslsurface/Makefile	2021-02-08 11:04:10.560207949 +0100
-+++ fsl/src/fslsurface/Makefile	2021-02-08 11:16:01.333691530 +0100
-@@ -37,7 +37,7 @@
- USRLDFLAGS = -L${LIB_NEWMAT}  -L${LIB_PROB} -L${LIB_ZLIB}
+--- fsl.orig/src/fslsurface/Makefile	2021-01-28 18:52:52.000000000 +0100
++++ fsl/src/fslsurface/Makefile	2021-12-02 20:01:27.353770000 +0100
+@@ -11,7 +11,7 @@
+ USRLDFLAGS = -L${LIB_NEWMAT}  -L${LIB_CPROB} -L${LIB_ZLIB}
  
  
 -LIBS=-lgiftiio -lexpat -lfirst_lib -lmeshclass
@@ -254,8 +213,8 @@ diff -Nru fsl.orig/src/fslsurface/Makefile fsl/src/fslsurface/Makefile
  APPLY_ZLIB = -DHAVE_ZLIB
  
 diff -Nru fsl.orig/src/libmeshutils/Makefile fsl/src/libmeshutils/Makefile
---- fsl.orig/src/libmeshutils/Makefile	2021-02-08 11:04:13.492461607 +0100
-+++ fsl/src/libmeshutils/Makefile	2021-02-08 11:16:31.780325153 +0100
+--- fsl.orig/src/libmeshutils/Makefile	2014-12-16 15:20:18.000000000 +0100
++++ fsl/src/libmeshutils/Makefile	2021-12-02 20:01:45.650118000 +0100
 @@ -3,7 +3,7 @@
  
  PROJNAME = meshUtils
@@ -266,8 +225,8 @@ diff -Nru fsl.orig/src/libmeshutils/Makefile fsl/src/libmeshutils/Makefile
  USRINCFLAGS = -I${INC_NEWMAT} -I${INC_ZLIB} -I${INC_PROB} -I${INC_BOOST} 
  USRLDFLAGS =  -L${LIB_PROB} -L${LIB_NEWMAT} -L${LIB_ZLIB}
 diff -Nru fsl.orig/src/mist/Makefile fsl/src/mist/Makefile
---- fsl.orig/src/mist/Makefile	2021-02-08 11:04:09.796141852 +0100
-+++ fsl/src/mist/Makefile	2021-02-08 11:17:24.424878915 +0100
+--- fsl.orig/src/mist/Makefile	2020-09-23 15:53:57.000000000 +0200
++++ fsl/src/mist/Makefile	2021-12-02 20:02:26.589779000 +0100
 @@ -1,16 +1,16 @@
  include ${FSLCONFDIR}/default.mk
  

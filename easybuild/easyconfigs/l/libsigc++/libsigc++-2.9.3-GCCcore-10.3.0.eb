@@ -1,0 +1,26 @@
+easyblock = 'ConfigureMake'
+
+name = 'libsigc++'
+version = '2.9.3'
+
+homepage = 'https://libsigcplusplus.github.io/libsigcplusplus/'
+description = """The libsigc++ package implements a typesafe callback system for standard C++."""
+
+toolchain = {'name': 'GCCcore', 'version': '10.3.0'}
+toolchainopts = {'pic': True}
+
+source_urls = [FTPGNOME_SOURCE]
+sources = [SOURCELOWER_TAR_XZ]
+checksums = ['0bf9b301ad6198c550986c51150a646df198e8d1d235270c16486b0dda30097f']
+
+builddependencies = [
+    ('binutils', '2.36.1'),
+    ('Autotools', '20210128'),
+]
+
+sanity_check_paths = {
+    'files': ['lib/libsigc-2.0.%s' % SHLIB_EXT],
+    'dirs': [],
+}
+
+moduleclass = 'devel'

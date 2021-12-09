@@ -1,0 +1,12 @@
+diff -Nru fsl.orig/config/buildSettings.mk fsl/config/buildSettings.mk
+--- fsl.orig/config/buildSettings.mk	2021-12-02 19:41:13.277862000 +0100
++++ fsl/config/buildSettings.mk	2021-06-11 17:19:38.000000000 +0200
+@@ -50,7 +50,7 @@
+ INC_PROB = ${FSLEXTINC}/cprob
+ # CPROB library
+ LIB_CPROB = ${FSLEXTLIB}
+-INC_CPROB = ${FSLEXTINC}/cprob
++INC_CPROB = ${FSLEXTINC}/
+ # NEWRAN library
+ LIB_NEWRAN = ${FSLEXTLIB}
+ INC_NEWRAN = ${FSLEXTINC}/newran

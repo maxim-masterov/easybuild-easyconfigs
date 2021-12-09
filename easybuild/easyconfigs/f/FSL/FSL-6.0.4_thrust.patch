@@ -1,0 +1,66 @@
+diff -Nru fsl.orig/src/fdt/CUDA/diffmodels.cuh fsl/src/fdt/CUDA/diffmodels.cuh
+--- fsl.orig/src/fdt/CUDA/diffmodels.cuh	2021-02-18 19:38:31.489821234 +0100
++++ fsl/src/fdt/CUDA/diffmodels.cuh	2021-02-18 19:41:36.973908675 +0100
+@@ -66,7 +66,7 @@
+     University, to negotiate a licence. Contact details are:
+     fsl@innovation.ox.ac.uk quoting Reference Project 9564, FSL.*/
+ 
+-#include <device_vector.h>
++#include <thrust/device_vector.h>
+ 
+ void fit_PVM_single(	//INPUT
+ 			const vector<ColumnVector> 	datam_vec, 
+diff -Nru fsl.orig/src/fdt/CUDA/runmcmc.cu fsl/src/fdt/CUDA/runmcmc.cu
+--- fsl.orig/src/fdt/CUDA/runmcmc.cu	2021-02-18 19:38:31.465819152 +0100
++++ fsl/src/fdt/CUDA/runmcmc.cu	2021-02-18 19:41:47.150791320 +0100
+@@ -71,8 +71,8 @@
+ #include "runmcmc_kernels.cu"
+ #include "sync_check.h"
+ 
+-#include <host_vector.h>
+-#include <device_vector.h> 
++#include <thrust/host_vector.h>
++#include <thrust/device_vector.h> 
+ 
+ #include <time.h>
+ #include <sys/time.h>
+diff -Nru fsl.orig/src/fdt/CUDA/xfibres_gpu.cu fsl/src/fdt/CUDA/xfibres_gpu.cu
+--- fsl.orig/src/fdt/CUDA/xfibres_gpu.cu	2021-02-18 19:38:31.473819846 +0100
++++ fsl/src/fdt/CUDA/xfibres_gpu.cu	2021-02-18 19:41:57.151658698 +0100
+@@ -76,8 +76,8 @@
+ #include "samples.h"
+ #include "options.h"
+ 
+-#include <host_vector.h>
+-#include <device_vector.h> 
++#include <thrust/host_vector.h>
++#include <thrust/device_vector.h> 
+ 
+ #include <time.h>
+ #include <sys/time.h>
+diff -Nru fsl.orig/src/fdt/CUDA/xfibres_gpu.cuh fsl/src/fdt/CUDA/xfibres_gpu.cuh
+--- fsl.orig/src/fdt/CUDA/xfibres_gpu.cuh	2021-02-18 19:38:31.481820540 +0100
++++ fsl/src/fdt/CUDA/xfibres_gpu.cuh	2021-02-18 19:42:01.420028894 +0100
+@@ -67,8 +67,8 @@
+     fsl@innovation.ox.ac.uk quoting Reference Project 9564, FSL.*/
+ 
+ #include "newimage/newimageall.h"
+-#include <host_vector.h>
+-#include <device_vector.h> 
++#include <thrust/host_vector.h>
++#include <thrust/device_vector.h> 
+ 
+ #include "fibre_gpu.h"
+ #include <curand_kernel.h>
+diff -Nru fsl.orig/src/fdt/Makefile fsl/src/fdt/Makefile
+--- fsl.orig/src/fdt/Makefile	2021-02-18 19:38:31.421815335 +0100
++++ fsl/src/fdt/Makefile	2021-02-18 19:42:22.861888544 +0100
+@@ -171,7 +171,7 @@
+ 		   ${CXX} ${CXXFLAGS} ${LDFLAGS} -o $@ ${EDDYCOMBINEOBJS} ${DLIBS}
+ 
+ ${LIBBEDPOSTX_CUDA}:
+-		${NVCC} --shared --compiler-options '-fPIC' -o CUDA/libbedpostx_cuda.so CUDA/init_gpu.cu CUDA/samples.cu CUDA/diffmodels.cu CUDA/runmcmc.cu  CUDA/xfibres_gpu.cu -O3 ${GENCODE_FLAGS} -lcudart -lcuda -lcurand -I. -L${LIB_CUDA} -L${LIB_CUDA}/stubs -ICUDA/options -I${INC_NEWMAT} -I${FSLDIR}/include -I${INC_BOOST} -I${INC_CUDA} -I${INC_CUDA}/thrust -maxrregcount=64
++		${NVCC} --shared --compiler-options '-fPIC' -o CUDA/libbedpostx_cuda.so CUDA/init_gpu.cu CUDA/samples.cu CUDA/diffmodels.cu CUDA/runmcmc.cu  CUDA/xfibres_gpu.cu -O3 ${GENCODE_FLAGS} -lcudart -lcuda -lcurand -I. -L${LIB_CUDA} -L${LIB_CUDA}/stubs -ICUDA/options -I${INC_NEWMAT} -I${FSLDIR}/include -I${INC_BOOST} -I${INC_CUDA} -maxrregcount=64
+ 		@if [ ! -d ${FSLDEVDIR}/lib/ ] ; then ${MKDIR} ${FSLDEVDIR}/lib ; fi
+ 		${CP} -rf CUDA/libbedpostx_cuda.so ${FSLDEVDIR}/lib
+ 
