@@ -53,7 +53,7 @@ dependencies = [
     ('VTK', '9.0.1'),
     ('GSL', '2.7'),
     ('Qwt', '6.2.0'),
-    ('CUDA', '11.3.1', '', True),
+    ('CUDA', '11.2.0', '', True),
 ]
 
 modextravars = {
